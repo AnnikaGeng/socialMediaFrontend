@@ -1,20 +1,36 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import AppNav from './utils/navigation/AppNav';
+import { AuthContextProvider } from './utils/context/AuthContext';
+import useFonts from './utils/useFonts';
+import * as SplashScreen from 'expo-splash-screen';
+
+
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+  const [isFontLoaded, setIsFontLoaded] = useState(false);
+  const LoadFonts = async () => {
+    await useFonts();
+    setIsFontLoaded(true);
+  };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  useEffect(() => {
+    async function loadFontsAndHideSplash() {
+      await LoadFonts();
+      SplashScreen.hideAsync();
+    }
+
+    SplashScreen.preventAutoHideAsync(); // Prevent the splash screen from hiding automatically
+    loadFontsAndHideSplash();
+  }, []);
+
+
+  if (!isFontLoaded) {
+    return null; // Render nothing until fonts are loaded
+  }
+
+  return (
+    <AuthContextProvider>
+      <AppNav />
+    </AuthContextProvider>
+  );
+} 
